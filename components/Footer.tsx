@@ -48,7 +48,7 @@ export default function Footer() {
             © {new Date().getFullYear()} YT Downloads. All rights reserved.
           </p>
           <p className="text-center text-gray-600 text-xs mt-2">
-            This service is for educational purposes only. Please respect copyright laws and YouTube's terms of service.
+            This service is for educational purposes only. Please respect copyright laws and YouTube&apos;s terms of service.
           </p>
         </div>
       </div>
