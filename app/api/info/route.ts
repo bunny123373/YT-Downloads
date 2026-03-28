@@ -108,7 +108,7 @@ async function getVideoMetadata(url: string): Promise<VideoInfo> {
           })
           .slice(0, 10);
 
-        const sortedAudio = [...new Map(audioFormats.map(a => [a.bitrate, a])).values()]
+        const sortedAudio = Array.from(new Map(audioFormats.map(a => [a.bitrate, a])).values())
           .sort((a, b) => b.bitrate - a.bitrate);
 
         const videoInfo: VideoInfo = {

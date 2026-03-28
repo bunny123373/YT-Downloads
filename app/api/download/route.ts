@@ -4,7 +4,7 @@ import { Readable } from 'stream';
 import { ApiResponse, DownloadRequest } from '@/types';
 import { extractVideoId, sanitizeFilename } from '@/lib/utils';
 
-export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<Readable>>> {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const body: DownloadRequest = await request.json();
     const { url, formatId, bitrate, outputType, title } = body;

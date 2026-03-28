@@ -62,7 +62,7 @@ export default function Home() {
         </section>
       )}
 
-      {videoInfo && !isLoading && downloadState.status === 'ready' && (
+      {videoInfo && !isLoading && (
         <section className="py-12 px-4">
           <div className="max-w-4xl mx-auto">
             <ResultCard video={videoInfo} />
