@@ -1,0 +1,14 @@
+[providers]
+node = "18"
+
+[pkg]
+ffmpeg = "5"
+
+[phases.build]
+command = "pip install yt-dlp && npm install && npm run build"
+
+[phases.start]
+command = "npm start"
+
+[env]
+NODE_ENV = "production"
