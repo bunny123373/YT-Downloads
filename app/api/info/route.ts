@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { spawn } from 'child_process';
+import ytdl from 'ytdl-core';
 import { ApiResponse, VideoInfo, FormatItem, AudioFormat } from '@/types';
 import { extractVideoId } from '@/lib/utils';
 
@@ -24,7 +24,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     }
 
     const fullUrl = url.startsWith('http') ? url : `https://www.youtube.com/watch?v=${videoId}`;
-
     const metadata = await getVideoMetadata(fullUrl);
 
     return NextResponse.json({
@@ -41,100 +40,64 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
 }
 
 async function getVideoMetadata(url: string): Promise<VideoInfo> {
-  return new Promise((resolve, reject) => {
-    const args = [
-      url,
-      '--dump-json',
-      '--no-download',
-      '--no-playlist',
-      '--quiet',
-    ];
+  const info = await ytdl.getInfo(url);
+  
+  const formats: FormatItem[] = [];
+  const audioFormats: AudioFormat[] = [];
 
-    const ytDlp = spawn('yt-dlp', args);
-    let data = '';
-    let errorData = '';
-
-    ytDlp.stdout.on('data', (chunk) => {
-      data += chunk.toString();
-    });
-
-    ytDlp.stderr.on('data', (chunk) => {
-      errorData += chunk.toString();
-    });
-
-    ytDlp.on('close', (code) => {
-      if (code !== 0 && !data) {
-        reject(new Error(errorData || 'Failed to fetch video metadata'));
-        return;
-      }
-
-      try {
-        const json = JSON.parse(data);
-        
-        const formats: FormatItem[] = [];
-        const audioFormats: AudioFormat[] = [];
-
-        if (json.formats) {
-          json.formats.forEach((format: Record<string, unknown>) => {
-            if (format.vcodec && format.vcodec !== 'none') {
-              formats.push({
-                format_id: format.format_id as string,
-                ext: format.ext as string,
-                resolution: format.resolution as string || 'Unknown',
-                filesize: format.filesize as number | null,
-                format_note: format.format_note as string || '',
-                vcodec: format.vcodec as string,
-                acodec: format.acodec as string | undefined,
-              });
-            }
-
-            if (format.acodec && format.acodec !== 'none' && format.abr) {
-              audioFormats.push({
-                format_id: format.format_id as string,
-                ext: format.ext as string,
-                bitrate: format.abr as number,
-                format_note: format.format_note as string || '',
-              });
-            }
-          });
-        }
-
-        const filteredFormats = formats
-          .filter(f => f.resolution.includes('x'))
-          .sort((a, b) => {
-            const resA = parseInt(a.resolution.split('x')[0]) || 0;
-            const resB = parseInt(b.resolution.split('x')[0]) || 0;
-            return resB - resA;
-          })
-          .slice(0, 10);
-
-        const sortedAudio = Array.from(new Map(audioFormats.map(a => [a.bitrate, a])).values())
-          .sort((a, b) => b.bitrate - a.bitrate);
-
-        const videoInfo: VideoInfo = {
-          id: json.id,
-          title: json.title,
-          thumbnail: json.thumbnail || `https://img.youtube.com/vi/${json.id}/maxresdefault.jpg`,
-          duration: json.duration || 0,
-          formats: filteredFormats,
-          audioFormats: sortedAudio,
-          description: json.description,
-          uploader: json.uploader || json.channel,
-          upload_date: json.upload_date,
-          view_count: json.view_count,
-          like_count: json.like_count,
-        };
-
-        resolve(videoInfo);
-      } catch (err) {
-        reject(new Error('Failed to parse video metadata'));
-      }
-    });
-
-    ytDlp.on('error', (err) => {
-      reject(new Error(`yt-dlp not found: ${err.message}`));
-    });
+  const videoFormats = info.formats.filter(f => f.hasVideo && f.hasAudio === false);
+  videoFormats.forEach((format) => {
+    if (format.qualityLabel) {
+      const resolution = format.qualityLabel.replace('p', '').trim();
+      formats.push({
+        format_id: format.itag?.toString() || '',
+        ext: format.container,
+        resolution: `${resolution}x${format.qualityLabel.split('p')[0]}`,
+        filesize: format.contentLength ? parseInt(format.contentLength) : null,
+        format_note: format.qualityLabel || format.quality || '',
+        vcodec: format.codecs?.split(',')[0] || 'unknown',
+        acodec: undefined,
+      });
+    }
   });
+
+  const audioOnlyFormats = info.formats.filter(f => f.hasAudio && !f.hasVideo);
+  audioOnlyFormats.forEach((format) => {
+    if (format.audioBitrate) {
+      audioFormats.push({
+        format_id: format.itag?.toString() || '',
+        ext: format.container,
+        bitrate: format.audioBitrate,
+        format_note: format.audioQuality || '',
+      });
+    }
+  });
+
+  const filteredFormats = formats
+    .filter(f => f.resolution.includes('x'))
+    .sort((a, b) => {
+      const resA = parseInt(a.resolution.split('x')[0]) || 0;
+      const resB = parseInt(b.resolution.split('x')[0]) || 0;
+      return resB - resA;
+    })
+    .slice(0, 10);
+
+  const sortedAudio = Array.from(new Map(audioFormats.map(a => [a.bitrate, a])).values())
+    .sort((a, b) => b.bitrate - a.bitrate);
+
+  const videoInfo: VideoInfo = {
+    id: info.videoDetails.videoId,
+    title: info.videoDetails.title,
+    thumbnail: info.videoDetails.thumbnails?.[0]?.url ?? `https://img.youtube.com/vi/${info.videoDetails.videoId}/maxresdefault.jpg`,
+    duration: parseInt(info.videoDetails.lengthSeconds || '0'),
+    formats: filteredFormats,
+    audioFormats: sortedAudio,
+    description: info.videoDetails.description ?? undefined,
+    uploader: info.videoDetails.ownerChannelName,
+    view_count: parseInt(info.videoDetails.viewCount || '0'),
+  };
+
+  return videoInfo;
 }
 
 export async function OPTIONS(): Promise<NextResponse> {

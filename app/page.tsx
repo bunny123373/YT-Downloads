@@ -37,9 +37,9 @@ export default function Home() {
       <HeroSection onAnalyze={handleAnalyze} isLoading={downloadState.status === 'analyzing'} />
 
       {isLoading && (
-        <section className="py-12 px-4">
+        <section className="py-8 sm:py-12 px-3 sm:px-4">
           <div className="max-w-4xl mx-auto">
-            <div className="glass rounded-2xl p-8">
+            <div className="glass rounded-2xl p-4 sm:p-8">
               <Loader message={downloadState.message} />
             </div>
           </div>
@@ -47,13 +47,13 @@ export default function Home() {
       )}
 
       {error && (
-        <section className="py-12 px-4">
+        <section className="py-8 sm:py-12 px-3 sm:px-4">
           <div className="max-w-4xl mx-auto">
-            <div className="glass rounded-2xl p-8 border-red-500/30">
-              <p className="text-red-400 text-center">{error}</p>
+            <div className="glass rounded-2xl p-4 sm:p-6 lg:p-8 border-red-500/30">
+              <p className="text-red-400 text-center text-sm sm:text-base">{error}</p>
               <button
                 onClick={handleReset}
-                className="mt-4 mx-auto block px-6 py-2 bg-dark-800 hover:bg-dark-700 rounded-lg text-white transition-colors"
+                className="mt-4 mx-auto block px-4 sm:px-6 py-2 bg-dark-800 hover:bg-dark-700 rounded-lg text-white transition-colors"
               >
                 Try Again
               </button>
@@ -63,7 +63,7 @@ export default function Home() {
       )}
 
       {videoInfo && !isLoading && (
-        <section className="py-12 px-4">
+        <section className="py-8 sm:py-12 px-3 sm:px-4">
           <div className="max-w-4xl mx-auto">
             <ResultCard video={videoInfo} />
             
@@ -79,10 +79,10 @@ export default function Home() {
               isLoading={downloadState.status === 'converting'}
             />
 
-            <div className="mt-8 text-center">
+            <div className="mt-6 sm:mt-8 text-center">
               <button
                 onClick={handleReset}
-                className="px-6 py-3 bg-dark-800 hover:bg-dark-700 border border-white/10 rounded-xl text-white transition-colors"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-dark-800 hover:bg-dark-700 border border-white/10 rounded-xl text-white transition-colors"
               >
                 Download Another
               </button>
@@ -92,13 +92,13 @@ export default function Home() {
       )}
 
       {downloadState.status === 'complete' && (
-        <section className="py-12 px-4">
+        <section className="py-8 sm:py-12 px-3 sm:px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="glass rounded-2xl p-8 border-green-500/30">
-              <p className="text-green-400 text-lg mb-4">{downloadState.message}</p>
+            <div className="glass rounded-2xl p-4 sm:p-6 lg:p-8 border-green-500/30">
+              <p className="text-green-400 text-base sm:text-lg mb-3 sm:mb-4">{downloadState.message}</p>
               <button
                 onClick={handleReset}
-                className="px-6 py-3 bg-purple-600 hover:bg-purple-500 rounded-xl text-white transition-colors"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-purple-600 hover:bg-purple-500 rounded-xl text-white transition-colors"
               >
                 Download Another
               </button>

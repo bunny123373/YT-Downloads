@@ -37,44 +37,44 @@ export default function FormatSelector({ video, onSelectFormat, isLoading }: For
   };
 
   return (
-    <div className="mt-8">
+    <div className="mt-6 lg:mt-8">
       <div className="flex items-center gap-3 mb-4">
         <FaFilm className="text-purple-400" />
         <h3 className="text-lg font-semibold text-white">Video Formats</h3>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {filteredFormats.map((format, index) => (
           <button
             key={format.format_id}
             onClick={() => onSelectFormat(format.format_id)}
             disabled={isLoading}
-            className="group relative p-4 bg-dark-800/50 hover:bg-dark-700/50 border border-white/5 hover:border-purple-500/30 rounded-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="group relative p-3 sm:p-4 bg-dark-800/50 hover:bg-dark-700/50 border border-white/5 hover:border-purple-500/30 rounded-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
             
-            <div className="relative flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
-                  <FaVideo className="text-purple-400" />
+            <div className="relative flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center flex-shrink-0">
+                  <FaVideo className="text-purple-400 text-sm sm:text-base" />
                 </div>
-                <div className="text-left">
-                  <p className="font-semibold text-white">
+                <div className="text-left min-w-0">
+                  <p className="font-semibold text-white text-sm sm:text-base truncate">
                     {getResolutionLabel(format.resolution)}
                   </p>
-                  <p className="text-xs text-gray-500">{format.resolution}</p>
+                  <p className="text-xs text-gray-500 truncate">{format.resolution}</p>
                 </div>
               </div>
 
-              <div className="text-right">
+              <div className="text-right flex-shrink-0">
                 <p className="text-xs text-gray-400">
                   {formatFileSize(format.filesize)}
                 </p>
-                <p className="text-xs text-gray-500">{format.ext}</p>
+                <p className="text-xs text-gray-500 uppercase">{format.ext}</p>
               </div>
             </div>
 
-            <div className="mt-3 flex items-center justify-center gap-2 text-sm text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="mt-2 sm:mt-3 flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity">
               <FaDownload />
               <span>Download</span>
             </div>

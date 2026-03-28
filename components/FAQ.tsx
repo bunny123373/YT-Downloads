@@ -34,10 +34,10 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="py-24 bg-dark-950 relative">
-      <div className="max-w-3xl mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+    <section id="faq" className="py-16 sm:py-20 lg:py-24 bg-dark-950 relative">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-10 sm:mb-12 lg:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">
             <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
               Frequently Asked
             </span>{' '}
@@ -45,12 +45,12 @@ export default function FAQ() {
               Questions
             </span>
           </h2>
-          <p className="text-gray-400">
+          <p className="text-gray-400 text-sm sm:text-base">
             Got questions? We have answers.
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {faqs.map((faq, index) => (
             <div
               key={index}
@@ -58,11 +58,11 @@ export default function FAQ() {
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full flex items-center justify-between p-5 text-left"
+                className="w-full flex items-center justify-between p-4 sm:p-5 text-left"
               >
-                <span className="font-medium text-white">{faq.question}</span>
+                <span className="font-medium text-white text-sm sm:text-base pr-2">{faq.question}</span>
                 <FaChevronDown 
-                  className={`text-gray-400 transition-transform duration-300 ${
+                  className={`text-gray-400 transition-transform duration-300 flex-shrink-0 ${
                     openIndex === index ? 'rotate-180' : ''
                   }`} 
                 />
@@ -73,7 +73,7 @@ export default function FAQ() {
                   openIndex === index ? 'max-h-40' : 'max-h-0'
                 }`}
               >
-                <p className="px-5 pb-5 text-gray-400 text-sm">
+                <p className="px-4 sm:px-5 pb-4 sm:pb-5 text-gray-400 text-xs sm:text-sm">
                   {faq.answer}
                 </p>
               </div>
