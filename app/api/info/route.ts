@@ -32,15 +32,35 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     });
   } catch (error) {
     console.error('Error fetching video info:', error);
+    let errorMessage = 'Failed to fetch video information';
+    
+    if (error instanceof Error) {
+      if (error.message.includes('Video unavailable')) {
+        errorMessage = 'This video is unavailable or has been removed';
+      } else if (error.message.includes('429')) {
+        errorMessage = 'Too many requests. Please try again later';
+      } else if (error.message.includes('403')) {
+        errorMessage = 'Access denied. This video may be private or age-restricted';
+      } else {
+        errorMessage = error.message;
+      }
+    }
+    
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Failed to fetch video information' },
+      { success: false, error: errorMessage },
       { status: 500 }
     );
   }
 }
 
 async function getVideoMetadata(url: string): Promise<VideoInfo> {
-  const info = await ytdl.getInfo(url);
+  const info = await ytdl.getInfo(url, {
+    requestOptions: {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      },
+    },
+  });
   
   const formats: FormatItem[] = [];
   const audioFormats: AudioFormat[] = [];
